@@ -1,0 +1,77 @@
+import React from 'react';
+import Header from '../../containers/Header'
+import firebase from '../../firebase'
+import {Avatar,Button, Modal, ListItemText, Typography,List, ListItem, ListItemAvatar} from '@material-ui/core'
+import {Link} from 'react-router-dom'
+import {connect} from 'react-redux'
+class Profile extends React.Component {
+    state = {
+        user: firebase.database().ref('users'),
+        profile: '',
+        open: false,
+        currentUser: this.props.currentUser
+    }
+
+    componentDidMount(){
+        this.state.user.child(this.state.currentUser.uid).on("value", snap => {
+           this.setState({profile: snap.val()})
+        });
+    }
+    updateProfile = () => {
+        this.setState({ open: true });
+        console.log('up');
+    }
+    deleteProfile = () => {
+        console.log('de');
+    }
+
+    handleClose = () => {
+        this.setState({ open: false });
+    }
+
+
+    render() {
+        const {profile, open} = this.state
+        return (
+            <div>
+                <Header/>
+                <div className="block_container">
+                    <List>
+                    <h1>profile</h1>
+                    {profile && (
+                        <ListItem alignItems="flex-start">
+                            <ListItemAvatar>
+                                <Avatar alt="Remy Sharp" src={ profile.photoURL} />
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={profile.firstName +' '+ profile.lastName}
+                                secondary={
+                                    <React.Fragment>
+                                        <Typography component="span" color="textPrimary">
+                                           Email: {profile.email}
+                                           Phone Number: {profile.phone}
+                                        </Typography>
+                                        {" — I'll be in your neighborhood doing errands this…"}
+                                    </React.Fragment>
+                                }
+                            />
+                        </ListItem>
+
+                    )}
+                    </List>
+                    <Button><Link to="/update">Update Profile</Link></Button>
+                    <Button onClick={this.deleteProfile}>Delete Account</Button>
+
+                </div>
+            </div>
+
+        )
+    }
+}
+
+const mapStateToProps = state => ({
+    currentUser: state.user.currentUser
+});
+
+
+export default connect(mapStateToProps)( Profile );

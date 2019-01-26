@@ -1,0 +1,29 @@
+.block_container {
+  max-width: 950px;
+  margin: auto;
+
+}
+@media (max-width: 991px) {
+  .block_container {
+    width: 90%;
+  }
+}
+.modal {
+
+  position: absolute;
+  width: 90%;
+  max-width: 950px;
+  background-color:white;
+
+  padding: 20px;
+  outline: none;
+
+}
+.drag_box {
+  width: 350px;
+  padding: 10px;
+  border: 1px solid #aaaaaa;
+}
+.hide {
+  display: none;
+}

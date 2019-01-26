@@ -1,0 +1,343 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import {TextField,SnackbarContent, FormControl, MenuItem, Icon, Button} from '@material-ui/core'
+import firebase from '../../firebase';
+import md5 from "md5";
+import SaveUser from '../../Auth/SaveUser';
+import {connect} from "react-redux";
+
+
+
+const styles = theme => ({
+    container: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+    textField: {
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        width: 200,
+    },
+    dense: {
+        marginTop: 19,
+    },
+    menu: {
+        width: 200,
+    },
+});
+
+
+class AddUser extends React.Component {
+    state = {
+        group: '',
+        loading: false,
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        phone: '',
+        usersRef: firebase.database().ref('users'),
+        groupsRef: firebase.database().ref('groups'),
+        companyName: this.props.currentUser.displayName,
+        users: [],
+        allGroups: [],
+        errors: {message: 'test'}
+    };
+    /*
+        * life cycle
+     */
+
+    componentDidMount() {
+        let loadUsers = [],
+            allGroups = [];
+        let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
+        firebase.database().ref(collection).child('users').on('child_added', snap => {
+            // whenever child added (message or anything else) execute these
+            loadUsers.push(snap.val());
+
+            this.setState({users: loadUsers, firstName: '', lastName: '', email: '', password: '', phone: '',
+                group: '', photoURL: '', loading: false})
+
+
+        })
+        firebase.database().ref(collection).child('users').on('child_removed', snap => {
+            // whenever child added (message or anything else) execute these
+            loadUsers.pop(snap.val());
+            this.setState({users: loadUsers} )
+
+        })
+        firebase.database().ref(collection).child('groups').on('child_added', snap => {
+            // whenever child added (message or anything else) execute these
+            allGroups.push(snap.val());
+            this.setState({allGroups: allGroups} )
+
+        })
+        firebase.database().ref(collection).child('groups').on('child_removed', snap => {
+            // whenever child added (message or anything else) execute these
+            allGroups.pop(snap.val());
+            this.setState({allGroups: allGroups} )
+
+        })
+    }
+    /*
+        * from check
+     */
+    isFormValid = () => {
+        let errors = [];
+        let error;
+
+        if (this.isFormEmpty(this.state)) {
+            error = { message: "Fill in all fields" };
+            this.setState({ errors: errors.concat(error) });
+            return false;
+        } else if (!this.isPasswordValid(this.state)) {
+            error = { message: "Password is invalid" };
+            this.setState({ errors: errors.concat(error) });
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    isFormEmpty = ({ firstName, lastName, email, password }) => {
+        return (
+            !firstName.length ||
+            !lastName.length ||
+            !email.length ||
+            !password.length
+        );
+    };
+
+    isPasswordValid = ({ password }) => {
+        if (password.length < 6 ) {
+            return false;
+        }  else {
+            return true;
+        }
+    };
+    /*
+        * displays
+     */
+
+    displayErrors = errors =>
+        errors.map((error, i) => <p key={i}>{error.message}</p>);
+    displayGroups = groups => (
+        groups && groups.map(group => (
+             <MenuItem  key={group.id} value={group.groupName}>
+                 {group.groupName}
+             </MenuItem>
+
+     ))
+    )
+    displayUsers = users => (
+        users.map((user, i)=> (
+                <div key={i} >
+                    {user.firstName}<Button onClick={()=>this.deleteUser(user.id)}><Icon >cancel_icon</Icon></Button>
+                </div>
+            )
+        )
+
+    )
+    /*
+        * handlers
+     */
+
+    handleClick = () => {
+        this.setState({ open: true });
+    };
+
+    handleChange = name => event => {
+        this.setState({
+            [name]: event.target.value,
+        });
+    };
+
+    handleSubmit = event => {
+        event.preventDefault();
+        let save = new SaveUser()
+        if(this.isFormValid() ) {
+           // this.addUser()
+
+            let result =  save.handleSubmit(this.state, false);
+
+
+        }
+    }
+    /*
+        * main functions
+     */
+
+    addUser = () => {
+        const {firstName, lastName, email, password, group, phone, usersRef}= this.state;
+        const key = usersRef.push().key
+        const newUser = {
+            id: key,
+            firstName: firstName,
+            lastName: lastName,
+            password: password,
+            email: email,
+            group: group,
+            phone: phone,
+            photoURL: `http://gravatar.com/avatar/${md5(
+                key
+            )}?d=identicon`
+
+        }
+        this.setState({loading: true})
+        usersRef
+            .child(key)
+            .update(newUser)
+            .then(()=> {
+                this.setState({firstName: '', lastName: '', email: '', password: '', phone: '',
+                                group: '', photoURL: ''})
+
+                this.setState({loading: false})
+            })
+            .catch(err=> {
+                console.log(err);
+                this.setState({loading: false})
+            })
+    }
+
+
+    deleteUser= id => {
+
+        let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
+
+        this.setState({loading: true})
+        firebase.database().ref(collection).child('users').child(id)
+            .remove(err => {
+                this.setState({loading: false})
+                if (err !== null) {
+                    console.error(err);
+                }else{
+                    console.log('no error');
+                }
+            });
+    }
+
+
+
+    render() {
+        const { classes } = this.props;
+        const {loading, users, errors, open} = this.state
+        return (
+            <div>
+                <h1>Add user</h1>
+                {!loading && this.displayUsers(users)}
+                <form className={classes.container} noValidate autoComplete="off">
+                    <FormControl margin="normal" required fullWidth>
+                        <TextField
+                            required
+                            label="First Name"
+                            type="text"
+                            className={classes.textField}
+                            value={this.state.firstName}
+                            margin="normal"
+                            onChange={this.handleChange('firstName')}
+                        />
+                        <TextField
+                            required
+                            label="Last Name"
+                            type="text"
+                            className={classes.textField}
+                            value={this.state.lastName}
+                            margin="normal"
+                            onChange={this.handleChange('lastName')}
+                        />
+                    </FormControl>
+                    <FormControl margin="normal" required fullWidth>
+                        <TextField
+                            required
+                            label="Email"
+                            type="email"
+                            className={classes.textField}
+                            value={this.state.email}
+                            margin="normal"
+                            onChange={this.handleChange('email')}
+                        />
+                        <TextField
+                            required
+                            id="standard-password-input"
+                            label="Password"
+                            className={classes.textField}
+                            type="password"
+                            autoComplete="current-password"
+                            margin="normal"
+                            value={this.state.password}
+                            onChange={this.handleChange('password')}
+                        />
+                    </FormControl>
+
+                    <FormControl margin="normal" required fullWidth>
+                        <TextField
+                            id="standard-number"
+                            label="Phone Number"
+                            value={this.state.phone}
+                            onChange={this.handleChange('phone')}
+                            type="number"
+                            className={classes.textField}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            margin="normal"
+                        />
+                    </FormControl>
+                    <FormControl margin="normal" required fullWidth>
+                        <TextField
+                            id="standard-select-currency"
+                            select
+                            label="Group"
+                            className={classes.textField}
+                            value={this.state.group}
+                            onChange={this.handleChange('group')}
+                            SelectProps={{
+                                MenuProps: {
+                                    className: classes.menu,
+                                },
+                            }}
+                            helperText="Please select your currency"
+                            margin="normal"
+                        >
+                            { this.displayGroups(this.state.allGroups)}
+                        </TextField>
+                    </FormControl>
+                    <br/>
+                    <FormControl margin="normal" required fullWidth>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            onClick={this.handleSubmit}
+                            disabled={loading}
+
+                        >
+                            Add User
+                        </Button>
+                    </FormControl>
+
+                </form>
+                {errors.length > 0 && (
+                    <SnackbarContent
+                        className={classes.snackbar}
+                        message={this.displayErrors(errors)}
+                       
+                    />
+
+                )}
+
+            </div>
+        );
+    }
+}
+
+AddUser.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+const mapStateToProps = state => ({
+    currentUser: state.user.currentUser
+});
+
+
+export default connect(mapStateToProps)(withStyles(styles)(AddUser));
