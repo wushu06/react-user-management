@@ -136,7 +136,7 @@ class AddGroup extends React.Component {
             id: key,
             groupName: groupName,
             groupDescription: groupDescription,
-            users: checked
+
         }
         firebase.database().ref(collection).child('groups')
             .child(key)
@@ -229,7 +229,7 @@ class AddGroup extends React.Component {
                         />
                     </FormControl>
 
-                    {this.displayUsers(users)}
+                    {/*this.displayUsers(users)*/}
 
                     <FormControl margin="normal" required fullWidth>
                         <Button

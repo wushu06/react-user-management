@@ -5,7 +5,7 @@ import firebase from "../firebase";
 class SaveUser extends React.Component {
 
 
-   handleSubmit = (state, collection = false) => {
+   handleSubmit = (state, collection) => {
        let errors = [];
        let loading = false;
        let result;
@@ -60,7 +60,8 @@ class SaveUser extends React.Component {
                 companyName: state.companyName,
                 email: state.email,
                 avatar: createdUser.user.photoURL,
-                id: createdUser.user.uid
+                id: createdUser.user.uid,
+                isAdmin: state.isAdmin
             })
     }
     addCollection = (createdUser, state) => {
@@ -73,14 +74,15 @@ class SaveUser extends React.Component {
             lastName: state.lastName,
             companyName: state.companyName,
             email: state.email,
-            avatar: createdUser.user.photoURL
+            avatar: createdUser.user.photoURL,
+            isAdmin: state.isAdmin
         }
         firebase.database().ref(collection)
             .child(key)
             .update(newUser)
             .then(()=> {
                 console.log('company created');
-                this.saveUser(createdUser,collection, state )
+                this.saveUser(createdUser, state )
 
             })
             .catch(err=> {

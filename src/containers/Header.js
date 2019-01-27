@@ -92,11 +92,13 @@ class Header extends React.Component {
         });
     };
     componentWillMount(){
+        if(this.props.currentUser) {
+            let collection = this.props.currentUser.displayName.replace(/[^a-zA-Z0-9]/g, '')
+            firebase.database().ref(collection).child('users').child(this.state.userData.uid).on("value", snap => {
+                //   this.setState({company: snap.val().companyName})
 
-        firebase.database().ref('users').child(this.state.userData.uid).on("value", snap => {
-        //   this.setState({company: snap.val().companyName})
-
-        });
+            });
+        }
     }
 
 

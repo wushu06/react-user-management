@@ -26,22 +26,19 @@ class Group extends React.Component {
             this.setState({groups: loadgroups}, ()=> {
 
             } )
-
         });
         firebase.database().ref(collection).child('groups').on('child_removed', snap => {
             // whenever child added (message or anything else) execute these
             loadgroups.pop(snap.val());
             this.setState({groups: loadgroups} )
 
-        });
-        firebase.database().ref(collection).child('groups').child('users').on('child_removed', snap => {
-            // whenever child added (message or anything else) execute these
-           console.log('deleted refresh');
 
         });
+
         firebase.database().ref(collection).child('users').on('child_added', snap => {
             // whenever child added (message or anything else) execute these
-            loadUsers.push(snap.val());
+
+            !snap.val().group && loadUsers.push(snap.val());
 
             this.setState({users: loadUsers})
 
@@ -92,8 +89,22 @@ class Group extends React.Component {
                 if (err !== null) {
                     console.error(err);
                 }else{
-                    console.log(groupId);
-                    console.log('no error');
+                    let loadgroups= []
+                    firebase.database().ref(collection).child('groups').on('child_added', snap => {
+                        // whenever child added (message or anything else) execute these
+                        loadgroups.push(snap.val());
+                        this.setState({groups: loadgroups}, () => {
+
+                        })
+                    })
+                    firebase.database().ref(collection).child('users')
+                        .child(userId)
+                        .update({
+                            group: ''
+                        })
+
+
+
                 }
             });
     }
@@ -113,6 +124,14 @@ class Group extends React.Component {
             .then(()=> {
                 // this.props.getGroups(this.state.groups)
                 console.log('user added');
+                let loadgroups = []
+                firebase.database().ref(collection).child('groups').on('child_added', snap => {
+                    // whenever child added (message or anything else) execute these
+                    loadgroups.push(snap.val());
+                    this.setState({groups: loadgroups}, () => {
+
+                    })
+                })
 
             })
             .catch(err=> {
@@ -125,12 +144,13 @@ class Group extends React.Component {
             })
             .then(()=> {
                 // this.props.getGroups(this.state.groups)
-                console.log('user added');
+               // console.log('user added');
 
             })
             .catch(err=> {
                 console.log(err);
             })
+
     }
 
     displayUsers = users => (
@@ -157,17 +177,17 @@ class Group extends React.Component {
         ev.preventDefault();
         let data = ev.dataTransfer.getData("text");
         let el = document.getElementById(data)
-        ev.target.appendChild(el);
+         $(el).hide()
+       // ev.target.appendChild(el);
         let userId = el.getAttribute("data-id");
         let userName = el.getAttribute("data-name");
-        $(el).append('<button id="test">x</button>')
+        //$(el).append('<button id="test">x</button>')
 
          this.addUserToGroup(group, userId, userName);
-        let self = this
+       /* let self = this
         $('#test').on('click', function () {
             self.deleteGroupUser(group.id, userId);
-        })
-       //  document.getElementById('test').addEventListener(' click',))
+        })*/
 
 
      }

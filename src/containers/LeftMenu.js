@@ -50,18 +50,27 @@ class LeftMenu extends React.Component {
                         </List>
                         <Divider />
                         <List>
-                            <Link to="/profile" >
-                            <ListItem button >
-                                <ListItemText primary="Profile" />
-                            </ListItem>
+                            <Link to="/groups" >
+                                <ListItem button >
+                                    <ListItemText primary="Manage Groups" />
+                                </ListItem>
                             </Link>
 
                         </List>
                         <Divider />
                         <List>
-                            <Link to="/groups" >
+                            <Link to="/manager" >
                                 <ListItem button >
-                                    <ListItemText primary="Groups" />
+                                    <ListItemText primary="Manage Users" />
+                                </ListItem>
+                            </Link>
+
+                        </List>
+                        <Divider />
+                        <List>
+                            <Link to="/holiday" >
+                                <ListItem button >
+                                    <ListItemText primary="Request Holiday" />
                                 </ListItem>
                             </Link>
 

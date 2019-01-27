@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import {TextField,SnackbarContent, FormControl, MenuItem, Icon, Button} from '@material-ui/core'
+import {TextField,SnackbarContent,FormControl, Checkbox,FormControlLabel, MenuItem, Icon, Button} from '@material-ui/core'
 import firebase from '../../firebase';
 import md5 from "md5";
 import SaveUser from '../../Auth/SaveUser';
@@ -42,6 +42,7 @@ class AddUser extends React.Component {
         companyName: this.props.currentUser.displayName,
         users: [],
         allGroups: [],
+        isAdmin: false,
         errors: {message: 'test'}
     };
     /*
@@ -142,7 +143,11 @@ class AddUser extends React.Component {
     /*
         * handlers
      */
-
+    handleChangeCheckbox = event => {
+        this.setState(prevState => ({
+            isAdmin: !prevState.isAdmin
+        }));
+    }
     handleClick = () => {
         this.setState({ open: true });
     };
@@ -168,6 +173,7 @@ class AddUser extends React.Component {
         * main functions
      */
 
+    // not used
     addUser = () => {
         const {firstName, lastName, email, password, group, phone, usersRef}= this.state;
         const key = usersRef.push().key
@@ -302,7 +308,18 @@ class AddUser extends React.Component {
                         >
                             { this.displayGroups(this.state.allGroups)}
                         </TextField>
+
                     </FormControl>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={this.state.isAdmin}
+                                onChange={this.handleChangeCheckbox}
+                            />
+                        }
+                        label="Admin"
+                    />
+
                     <br/>
                     <FormControl margin="normal" required fullWidth>
                         <Button

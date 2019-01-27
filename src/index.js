@@ -17,6 +17,8 @@ import Register from './Auth/Register'
 import firebase from "./firebase";
 import Spinner from './Spinner';
 import Groups from './components/Group';
+import Manager from './components/User/Manager';
+import Holiday from './components/User/Holiday'
 const store = createStore(rootReducer, composeWithDevTools());
 
 
@@ -24,6 +26,7 @@ const store = createStore(rootReducer, composeWithDevTools());
 class Root extends React.Component {
 
     componentDidMount(){
+        console.log(this.props.currentUser);
         firebase.auth().onAuthStateChanged(user => {
 
             if(user){
@@ -37,8 +40,10 @@ class Root extends React.Component {
                 }
 
             }else{
-                this.props.clearUser(user);
+
+
                 this.props.history.push('/login')
+                this.props.clearUser(user);
             }
         });
     }
@@ -53,6 +58,8 @@ class Root extends React.Component {
                 <Route path="/login" component={Login} />
                 <Route path="/register" component={Register} />
                 <Route path="/groups" component={Groups} />
+                <Route path="/holiday" component={Holiday} />
+                <Route path="/manager" component={Manager} />
             </Switch>
 
         )
@@ -61,6 +68,7 @@ class Root extends React.Component {
 
 const mapStateFromProps = state => ({
     isLoading: state.user.isLoading,
+    currentUser: state.user.currentUser
 })
 
 const RootWithAuth = withRouter(connect(mapStateFromProps, {setUser, clearUser, getGroups} )(Root))

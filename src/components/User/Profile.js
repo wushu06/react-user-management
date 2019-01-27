@@ -9,11 +9,15 @@ class Profile extends React.Component {
         user: firebase.database().ref('users'),
         profile: '',
         open: false,
-        currentUser: this.props.currentUser
+        currentUser: this.props.currentUser,
+        companyName: this.props.currentUser.displayName
+
     }
 
     componentDidMount(){
-        this.state.user.child(this.state.currentUser.uid).on("value", snap => {
+        console.log(this.state.currentUser.uid);
+        let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
+        firebase.database().ref(collection).child('users').child(this.state.currentUser.uid).on("value", snap => {
            this.setState({profile: snap.val()})
         });
     }
@@ -49,9 +53,16 @@ class Profile extends React.Component {
                                     <React.Fragment>
                                         <Typography component="span" color="textPrimary">
                                            Email: {profile.email}
-                                           Phone Number: {profile.phone}
                                         </Typography>
-                                        {" — I'll be in your neighborhood doing errands this…"}
+                                        <Typography component="span" color="textPrimary">
+                                            Phone Number: {profile.phone ? profile.phone : '(-- -- --)'}
+                                        </Typography>
+                                        <Typography component="span" color="textPrimary">
+                                            Group: {profile.group}
+                                        </Typography>
+                                        <Typography component="span" color="textPrimary">
+                                            Holiday: {profile.holiday}
+                                        </Typography>
                                     </React.Fragment>
                                 }
                             />
