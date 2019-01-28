@@ -3,9 +3,24 @@ import {Link} from 'react-router-dom'
 import {SwipeableDrawer, Divider, List, ListItem, ListItemIcon, ListItemText} from '@material-ui/core'
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import firebase from "../firebase";
+import {connect} from "react-redux";
 
 
 class LeftMenu extends React.Component {
+    state = {
+        companyName: this.props.currentUser.displayName,
+        firstName: ''
+
+    };
+
+    componentDidMount() {
+
+        let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
+
+        firebase.database().ref(collection).child('users').on('child_added', snap => {
+           this.setState({firstName: snap.val().firstName})
+        })
+    }
     handleLogout = () => {
         console.log('clicked');
         firebase
@@ -31,6 +46,13 @@ class LeftMenu extends React.Component {
                         onClick={toggleDrawerTrue}
                         onKeyDown={toggleDrawerFalse}
                     >
+                        {this.state.firstName &&
+                        <List>
+                            <ListItemText primary={this.state.firstName}/>
+
+                        </List>
+                        }
+                        <Divider />
                         <List>
                             <Link  to="/" >
                                 <ListItem button >
@@ -77,6 +99,15 @@ class LeftMenu extends React.Component {
                         </List>
                         <Divider />
                         <List>
+                            <Link to="/calendar" >
+                                <ListItem button >
+                                    <ListItemText primary="Caldendar" />
+                                </ListItem>
+                            </Link>
+
+                        </List>
+                        <Divider />
+                        <List>
                             <ListItem button onClick={this.handleLogout }>
 
                                 <ListItemText primary="Logout" />
@@ -96,4 +127,9 @@ class LeftMenu extends React.Component {
     }
 }
 
-export default LeftMenu;
+const mapStateToProps = state => ({
+    currentUser: state.user.currentUser
+});
+
+
+export default connect(mapStateToProps)(LeftMenu);

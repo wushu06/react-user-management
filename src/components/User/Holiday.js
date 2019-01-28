@@ -25,10 +25,11 @@ class Holiday extends React.Component {
         end: '',
         companyName: this.props.currentUser.displayName,
         errors: [],
-        holiday: 28
+        holiday: ''
     };
 
     componentDidMount() {
+
         let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
 
         firebase.database().ref(collection).child('users').on('child_added', snap => {
@@ -63,11 +64,12 @@ class Holiday extends React.Component {
     handleRequest = (start, end) => {
         if(start.year <= end.year && start.month <= end.month && start.day <= end.day)
         {
-            let remainDays = this.state.holiday -1
+
             let first = new Date(start.year, start.month-1, start.day);
             let second = new Date(end.year, end.month-1, end.day);
-            console.log(this.datediff(first, second))
-         //  this.sendRequest(remainDays)
+            let remainDays = this.state.holiday - this.datediff(first, second);
+            console.log(remainDays);
+            this.sendRequest(remainDays)
         }else{
             console.log('not valid');
         }
@@ -106,6 +108,7 @@ class Holiday extends React.Component {
                 <Header/>
                 <div className="block_container">
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <span>Number of holidays: {holiday ? holiday : '--'}</span>
                 <h1>Start of holiday</h1>
                 <Grid container className={classes.grid} justify="space-around">
                     <DatePicker
@@ -126,7 +129,7 @@ class Holiday extends React.Component {
                     />
                 </Grid>
             </MuiPickersUtilsProvider>
-                    <Button disabled={!(start && end && holiday !== '' )} onClick={()=>this.handleRequest(start, end)}>{holiday ? 'Request Holiday' : 'No holidays left'}</Button>
+                    <Button disabled={!(start && end && !holiday )} onClick={()=>this.handleRequest(start, end)}>{holiday ? 'Request Holiday' : 'No holidays left'}</Button>
                 </div>
             </div>
         );

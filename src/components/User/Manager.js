@@ -5,6 +5,7 @@ import {Button, Grid, Icon, List, Dialog, DialogActions, DialogContent, DialogCo
 import {Link} from 'react-router-dom'
 import {connect} from 'react-redux'
 import $ from 'jquery'
+import ManagerEdit from './ManagerEdit';
 
 
 
@@ -13,6 +14,7 @@ class Manager extends React.Component {
         groups: [],
         users: [],
         open: false,
+        alert: false,
         delete: false,
         id: ''
 
@@ -52,14 +54,20 @@ class Manager extends React.Component {
       * dialog
      */
     handleClickOpen = () => {
-        this.setState({ open: true });
+        this.setState({ alert: true });
     };
 
-    handleClose = () => {
-        this.setState({ open: false });
+    handleAlertClose = () => {
+        this.setState({ alert: false });
     }
+    deleteUser= id => {
+        this.handleClickOpen()
+        this.setState({id: id})
+
+    }
+
     handleAgree = () => {
-        this.setState({ open: false, delete: true });
+        this.setState({ alert: false, delete: true });
         let id = this.state.id
         if(id) {
             let collection = this.props.currentUser.displayName.replace(/[^a-zA-Z0-9]/g, '')
@@ -84,18 +92,34 @@ class Manager extends React.Component {
         users.map((user, i)=> (
                 <List key={i} >
                     {user.firstName}<Button  onClick={()=>this.deleteUser(user.id)}><Icon >cancel_icon</Icon></Button>
+                    <Button  onClick={()=>this.updateUser(user.id)}><Icon >edit_icon</Icon></Button>
                 </List>
             )
         )
 
     )
+    /*
+       * modal
+    */
+    handleOpen = () => {
+        console.log('open');
+        this.setState({ open: true });
+    };
 
+    handleClose = () => {
+        this.setState({ open: false });
+    };
 
-    deleteUser= id => {
-        this.handleClickOpen()
-        this.setState({id: id})
+    updateUser = userId => {
 
+        this.setState({id: userId}, ()=> this.handleOpen())
     }
+
+
+
+
+
+
 
     deleteFirebaseAccount = id => {
 
@@ -132,15 +156,15 @@ class Manager extends React.Component {
                     </Grid>
                 </div>
                 <Dialog
-                    open={this.state.open}
-                    onClose={this.handleClose}
+                    open={this.state.alert}
+                    onClose={this.handleAlertClose}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
                     <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete this user?"}</DialogTitle>
 
                     <DialogActions>
-                        <Button onClick={this.handleClose} color="primary">
+                        <Button onClick={this.handleAlertClose} color="primary">
                             Disagree
                         </Button>
                         <Button onClick={this.handleAgree} color="primary" autoFocus>
@@ -148,6 +172,12 @@ class Manager extends React.Component {
                         </Button>
                     </DialogActions>
                 </Dialog>
+                {this.state.open &&
+                <ManagerEdit modal={this.state.open}
+                             closeModal={this.handleClose}
+                             userId={this.state.id}
+                             collection={this.props.currentUser.displayName }/>
+                }
 
             </div>
 

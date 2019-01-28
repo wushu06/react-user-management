@@ -59,3 +59,14 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.input_row {
+  flex-direction: row !important;
+  justify-content: space-around !important;
+}
+.submit_row {
+  max-width: 300px;
+  margin: auto !important;
+  /* text-align: center; */
+  display: flex !important;
+}

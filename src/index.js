@@ -19,6 +19,8 @@ import Spinner from './Spinner';
 import Groups from './components/Group';
 import Manager from './components/User/Manager';
 import Holiday from './components/User/Holiday'
+import Calendar from './components/User/Calendar'
+
 const store = createStore(rootReducer, composeWithDevTools());
 
 
@@ -60,6 +62,7 @@ class Root extends React.Component {
                 <Route path="/groups" component={Groups} />
                 <Route path="/holiday" component={Holiday} />
                 <Route path="/manager" component={Manager} />
+                <Route path="/calendar" component={Calendar} />
             </Switch>
 
         )
