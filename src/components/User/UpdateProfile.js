@@ -30,7 +30,7 @@ const styles = theme => ({
 
 
 
-class UpdateUser extends React.Component {
+class UpdateProfile extends React.Component {
     state = {
         group: '',
         loading: false,
@@ -359,7 +359,7 @@ class UpdateUser extends React.Component {
     }
 }
 
-UpdateUser.propTypes = {
+UpdateProfile.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
@@ -368,4 +368,4 @@ const mapStateToProps = state => ({
 });
 
 
-export default connect(mapStateToProps)(withStyles(styles)(UpdateUser));
+export default connect(mapStateToProps)(withStyles(styles)(UpdateProfile));

@@ -61,7 +61,11 @@ class SaveUser extends React.Component {
                 email: state.email,
                 avatar: createdUser.user.photoURL,
                 id: createdUser.user.uid,
-                isAdmin: state.isAdmin
+                isAdmin: state.isAdmin,
+                holiday: {
+                    remainingDays: 0,
+                    range: []
+                }
             })
     }
     addCollection = (createdUser, state) => {
@@ -75,7 +79,12 @@ class SaveUser extends React.Component {
             companyName: state.companyName,
             email: state.email,
             avatar: createdUser.user.photoURL,
-            isAdmin: state.isAdmin
+            isAdmin: state.isAdmin,
+            holiday: {
+                remainingDays: 0,
+                range: []
+            }
+
         }
         firebase.database().ref(collection)
             .child(key)

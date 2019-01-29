@@ -11,7 +11,7 @@ import rootReducer from './reducers';
 import {getGroups, setUser, clearUser} from './action';
 import {Provider, connect} from 'react-redux';
 import Profile from './components/User/Profile'
-import UpdateProfile from './components/User/UpdateUser'
+import UpdateProfile from './components/User/UpdateProfile'
 import Login from './Auth/Login'
 import Register from './Auth/Register'
 import firebase from "./firebase";

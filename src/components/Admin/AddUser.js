@@ -187,7 +187,11 @@ class AddUser extends React.Component {
             phone: phone,
             photoURL: `http://gravatar.com/avatar/${md5(
                 key
-            )}?d=identicon`
+            )}?d=identicon`,
+            holiday: {
+                remainingDays: 0,
+                range: []
+            }
 
         }
         this.setState({loading: true})

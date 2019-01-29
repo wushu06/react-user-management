@@ -9,7 +9,7 @@ import {connect} from "react-redux";
 class LeftMenu extends React.Component {
     state = {
         companyName: this.props.currentUser.displayName,
-        firstName: ''
+        fullName: ''
 
     };
 
@@ -18,7 +18,9 @@ class LeftMenu extends React.Component {
         let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
 
         firebase.database().ref(collection).child('users').on('child_added', snap => {
-           this.setState({firstName: snap.val().firstName})
+            if(snap.val().id === this.props.currentUser.uid) {
+                this.setState({fullName: snap.val().firstName+' '+snap.val().lastName})
+            }
         })
     }
     handleLogout = () => {
@@ -46,9 +48,9 @@ class LeftMenu extends React.Component {
                         onClick={toggleDrawerTrue}
                         onKeyDown={toggleDrawerFalse}
                     >
-                        {this.state.firstName &&
+                        {this.state.fullName &&
                         <List>
-                            <ListItemText primary={this.state.firstName}/>
+                            <ListItemText primary={this.state.fullName}/>
 
                         </List>
                         }

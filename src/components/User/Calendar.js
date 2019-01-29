@@ -4,9 +4,44 @@ import $ from 'jquery';
 import 'fullcalendar';
 import 'moment'
 import '../../assets/fullcalendar.min.css'
+import firebase from "../../firebase";
+import {connect} from "react-redux";
+import moment from 'moment';
 
 class Calendar extends React.Component {
+    state = {
+        ranges: [],
+        companyName: this.props.currentUser.displayName,
+
+    }
     componentDidMount() {
+        let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
+        let ranges = []
+
+        firebase.database().ref(collection).child('users').on('child_added', snap => {
+            if (snap.val().holiday && 'range' in snap.val().holiday)
+                ranges.push({date:snap.val().holiday.range, name: snap.val().firstName});
+                 this.setState({ranges:ranges }, ()=> this.showCalendar())
+
+        })
+
+
+
+
+
+    }
+
+    showCalendar = () => {
+        let _self = this
+        let events = []
+        this.state.ranges.map((date, i) => {
+            date.date.map(item => {
+                 events = [...events]
+                return  events.push({title: date.name, start: item[0], end: item[1]})
+
+            })
+        })
+
         $('#calendar').fullCalendar({
             header: {
                 left: 'prev,next today',
@@ -32,64 +67,9 @@ class Calendar extends React.Component {
             },
             editable: true,
             eventLimit: true, // allow "more" link when too many events
-            events: [
-                {
-                    title: 'All Day Event',
-                    start: '2019-01-01'
-                },
-                {
-                    title: 'Long Event',
-                    start: '2019-01-07',
-                    end: '2019-01-10'
-                },
-                {
-                    id: 999,
-                    title: 'Repeating Event',
-                    start: '2019-01-09T16:00:00'
-                },
-                {
-                    id: 999,
-                    title: 'Repeating Event',
-                    start: '2019-01-16T16:00:00'
-                },
-                {
-                    title: 'Conference',
-                    start: '2019-01-11',
-                    end: '2019-01-13'
-                },
-                {
-                    title: 'Meeting',
-                    start: '2019-01-12T10:30:00',
-                    end: '2019-01-12T12:30:00'
-                },
-                {
-                    title: 'Lunch',
-                    start: '2019-01-12T12:00:00'
-                },
-                {
-                    title: 'Meeting',
-                    start: '2019-01-12T14:30:00'
-                },
-                {
-                    title: 'Happy Hour',
-                    start: '2019-01-12T17:30:00'
-                },
-                {
-                    title: 'Dinner',
-                    start: '2019-01-12T20:00:00'
-                },
-                {
-                    title: 'Birthday Party',
-                    start: '2019-01-13T07:00:00'
-                },
-                {
-                    title: 'Click for Google',
-                    url: 'http://google.com/',
-                    start: '2019-01-28'
-                }
-            ]
-        });
+            events: events
 
+        });
 
     }
     render() {
@@ -106,4 +86,9 @@ class Calendar extends React.Component {
     }
 }
 
-export default Calendar;
+const mapStateToProps = state => ({
+    currentUser: state.user.currentUser
+});
+
+
+export default connect(mapStateToProps)(Calendar);

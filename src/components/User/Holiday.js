@@ -9,6 +9,7 @@ import { MuiPickersUtilsProvider, TimePicker, DatePicker } from 'material-ui-pic
 import Header from '../../containers/Header'
 import {connect} from 'react-redux'
 import firebase from "../../firebase";
+import moment from 'moment';
 
 const styles = {
     grid: {
@@ -25,7 +26,8 @@ class Holiday extends React.Component {
         end: '',
         companyName: this.props.currentUser.displayName,
         errors: [],
-        holiday: ''
+        holiday: '',
+        range: []
     };
 
     componentDidMount() {
@@ -33,7 +35,12 @@ class Holiday extends React.Component {
         let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
 
         firebase.database().ref(collection).child('users').on('child_added', snap => {
-            snap.val().holiday && this.setState({holiday: snap.val().holiday})
+            if(snap.val().id === this.props.currentUser.uid) {
+                snap.val().holiday && this.setState({
+                    holiday: snap.val().holiday.remainingDays,
+                    range: snap.val().holiday.range ? snap.val().holiday.range : []
+                } )
+            }
         })
     }
 
@@ -65,11 +72,12 @@ class Holiday extends React.Component {
         if(start.year <= end.year && start.month <= end.month && start.day <= end.day)
         {
 
+
             let first = new Date(start.year, start.month-1, start.day);
             let second = new Date(end.year, end.month-1, end.day);
             let remainDays = this.state.holiday - this.datediff(first, second);
             console.log(remainDays);
-            this.sendRequest(remainDays)
+            this.sendRequest(remainDays,moment(start).format('YYYY-MM-DD'), moment(end).format('YYYY-MM-DD'))
         }else{
             console.log('not valid');
         }
@@ -81,13 +89,17 @@ class Holiday extends React.Component {
         return Math.round((second-first)/(1000*60*60*24));
     }
 
-    sendRequest =(remainDays) => {
+    sendRequest =(remainDays, start, end) => {
         let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
-
+        let range = this.state.range
+        range.push([start, end])
         firebase.database().ref(collection).child('users')
             .child(this.props.currentUser.uid)
             .update({
-                holiday: remainDays
+                holiday: {
+                    range:range,
+                    remainingDays: remainDays
+                }
             })
             .then(()=> {
                 this.setState({holiday: remainDays})
@@ -129,7 +141,7 @@ class Holiday extends React.Component {
                     />
                 </Grid>
             </MuiPickersUtilsProvider>
-                    <Button disabled={!(start && end && !holiday )} onClick={()=>this.handleRequest(start, end)}>{holiday ? 'Request Holiday' : 'No holidays left'}</Button>
+                    <Button disabled={!(start && end ) || !holiday} onClick={()=>this.handleRequest(start, end)}>{holiday ? 'Request Holiday' : 'No holidays left'}</Button>
                 </div>
             </div>
         );

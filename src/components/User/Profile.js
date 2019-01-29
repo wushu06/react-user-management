@@ -61,7 +61,7 @@ class Profile extends React.Component {
                                             Group: {profile.group}
                                         </Typography>
                                         <Typography component="span" color="textPrimary">
-                                            Holiday: {profile.holiday}
+                                            Holiday: {profile.holiday.remainingDays}
                                         </Typography>
                                     </React.Fragment>
                                 }
@@ -71,7 +71,7 @@ class Profile extends React.Component {
                     )}
                     </List>
                     <Button><Link to="/update">Update Profile</Link></Button>
-                    <Button onClick={this.deleteProfile}>Delete Account</Button>
+                    {/*<Button onClick={this.deleteProfile}>Delete Account</Button>*/}
 
                 </div>
             </div>

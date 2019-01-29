@@ -20,6 +20,7 @@ class ManagerEdit extends React.Component {
         users: [],
         allGroups: [],
         profile:'',
+        groupId: '',
         currentUser: this.props.currentUser,
         uploadState: "",
         percentUploaded: 0,
@@ -50,6 +51,12 @@ class ManagerEdit extends React.Component {
             [name]: event.target.value,
         });
     };
+    handleChangeGroup = name => event => {
+        this.setState({
+            [name]: event.target.value,
+            groupId: event.target
+        }, ()=> console.log(this.state.groupId));
+    };
     handleChangeCheckbox = event => {
         this.setState(prevState => ({
             isAdmin: !prevState.isAdmin
@@ -64,7 +71,7 @@ class ManagerEdit extends React.Component {
 
     displayGroups = groups => (
         groups && groups.map(group => (
-            <MenuItem  key={group.id} value={group.groupName}>
+            <MenuItem  key={group.id} value={[group.id, group.groupName]}>
                 {group.groupName}
             </MenuItem>
 
@@ -112,7 +119,7 @@ class ManagerEdit extends React.Component {
                         <TextField
                             required
                             id="standard-holiday-input"
-                            label={profile.holiday ? profile.holiday : 'Holiday'}
+                            label={profile.holiday && profile.holiday.remainingDays ? profile.holiday.remainingDays: 'Holiday'}
                             type="number"
                             autoComplete="current-holiday"
                             margin="normal"
@@ -147,10 +154,10 @@ class ManagerEdit extends React.Component {
                         <TextField
                             id="standard-select-currency"
                             select
-                            label={profile.group ? profile.group : 'Group' }
-                            
+                            label={profile.group ? profile.group[1] : 'Group' }
+                            name="group"
                             value={this.state.group}
-                            onChange={this.handleChange('group')}
+                            onChange={this.handleChangeGroup('group')}
 
                             helperText="Please select a group"
                             margin="normal"

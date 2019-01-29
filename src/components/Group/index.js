@@ -38,6 +38,7 @@ class Group extends React.Component {
         firebase.database().ref(collection).child('users').on('child_added', snap => {
             // whenever child added (message or anything else) execute these
 
+            // dont execlue but hide
             !snap.val().group && loadUsers.push(snap.val());
 
             this.setState({users: loadUsers})
@@ -80,7 +81,7 @@ class Group extends React.Component {
     )
 
     deleteGroupUser = (groupId, userId) => {
-
+        $('[data-id='+userId+']').show();
         let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
         this.setState({loading: true})
         firebase.database().ref(collection).child('groups').child(groupId).child('users').child(userId)
@@ -140,7 +141,7 @@ class Group extends React.Component {
         firebase.database().ref(collection).child('users')
             .child(userId)
             .update({
-                group: group.groupName
+                group: [group.id, group.groupName]
             })
             .then(()=> {
                 // this.props.getGroups(this.state.groups)
