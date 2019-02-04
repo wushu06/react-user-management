@@ -56,18 +56,12 @@ class AddUser extends React.Component {
         firebase.database().ref(collection).child('users').on('child_added', snap => {
             // whenever child added (message or anything else) execute these
             loadUsers.push(snap.val());
-
             this.setState({users: loadUsers, firstName: '', lastName: '', email: '', password: '', phone: '',
                 group: '', photoURL: '', loading: false})
 
 
         })
-        firebase.database().ref(collection).child('users').on('child_removed', snap => {
-            // whenever child added (message or anything else) execute these
-            loadUsers.pop(snap.val());
-            this.setState({users: loadUsers} )
 
-        })
         firebase.database().ref(collection).child('groups').on('child_added', snap => {
             // whenever child added (message or anything else) execute these
             allGroups.push(snap.val());
@@ -131,15 +125,7 @@ class AddUser extends React.Component {
 
      ))
     )
-    displayUsers = users => (
-        users.map((user, i)=> (
-                <div key={i} >
-                    {user.firstName}<Button onClick={()=>this.deleteUser(user.id)}><Icon >cancel_icon</Icon></Button>
-                </div>
-            )
-        )
 
-    )
     /*
         * handlers
      */
@@ -148,9 +134,7 @@ class AddUser extends React.Component {
             isAdmin: !prevState.isAdmin
         }));
     }
-    handleClick = () => {
-        this.setState({ open: true });
-    };
+
 
     handleChange = name => event => {
         this.setState({
@@ -158,73 +142,20 @@ class AddUser extends React.Component {
         });
     };
 
+
+    /*
+        * main functions
+     */
     handleSubmit = event => {
         event.preventDefault();
         let save = new SaveUser()
         if(this.isFormValid() ) {
-           // this.addUser()
+            // this.addUser()
 
             let result =  save.handleSubmit(this.state, false);
 
 
         }
-    }
-    /*
-        * main functions
-     */
-
-    // not used
-    addUser = () => {
-        const {firstName, lastName, email, password, group, phone, usersRef}= this.state;
-        const key = usersRef.push().key
-        const newUser = {
-            id: key,
-            firstName: firstName,
-            lastName: lastName,
-            password: password,
-            email: email,
-            group: group,
-            phone: phone,
-            photoURL: `http://gravatar.com/avatar/${md5(
-                key
-            )}?d=identicon`,
-            holiday: {
-                remainingDays: 0,
-                range: []
-            }
-
-        }
-        this.setState({loading: true})
-        usersRef
-            .child(key)
-            .update(newUser)
-            .then(()=> {
-                this.setState({firstName: '', lastName: '', email: '', password: '', phone: '',
-                                group: '', photoURL: ''})
-
-                this.setState({loading: false})
-            })
-            .catch(err=> {
-                console.log(err);
-                this.setState({loading: false})
-            })
-    }
-
-
-    deleteUser= id => {
-
-        let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
-
-        this.setState({loading: true})
-        firebase.database().ref(collection).child('users').child(id)
-            .remove(err => {
-                this.setState({loading: false})
-                if (err !== null) {
-                    console.error(err);
-                }else{
-                    console.log('no error');
-                }
-            });
     }
 
 
@@ -235,7 +166,6 @@ class AddUser extends React.Component {
         return (
             <div>
                 <h1>Add user</h1>
-                {!loading && this.displayUsers(users)}
                 <form className={classes.container} noValidate autoComplete="off">
                     <FormControl margin="normal" required fullWidth>
                         <TextField

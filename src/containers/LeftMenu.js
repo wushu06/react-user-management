@@ -24,13 +24,15 @@ class LeftMenu extends React.Component {
         })
     }
     handleLogout = () => {
-        console.log('clicked');
-        firebase
+        window.localStorage.removeItem('userId');
+         window.localStorage.removeItem('userCompanyName');
+        this.props.history.push('/login')
+       /* firebase
             .auth()
             .signOut()
             .then(()=> {
                 console.log('singed out');
-            });
+            });*/
 
     }
     render() {
@@ -83,7 +85,7 @@ class LeftMenu extends React.Component {
                         </List>
                         <Divider />
                         <List>
-                            <Link to="/manager" >
+                            <Link to="/users" >
                                 <ListItem button >
                                     <ListItemText primary="Manage Users" />
                                 </ListItem>

@@ -12,14 +12,17 @@ import {getGroups, setUser, clearUser} from './action';
 import {Provider, connect} from 'react-redux';
 import Profile from './components/User/Profile'
 import UpdateProfile from './components/User/UpdateProfile'
-import Login from './Auth/Login'
-import Register from './Auth/Register'
+import Login from './Auth/WPLogin'
+import Register from './Auth/WPRegister'
 import firebase from "./firebase";
 import Spinner from './Spinner';
-import Groups from './components/Group';
-import Manager from './components/User/Manager';
+import Groups from './components/Group/Manager';
+import User from './components/User/Manager';
 import Holiday from './components/User/Holiday'
 import Calendar from './components/User/Calendar'
+import Nomatch from './containers/404';
+import Kudos from './components/Kudos'
+import Board from './components/Kudos/Board'
 
 const store = createStore(rootReducer, composeWithDevTools());
 
@@ -28,8 +31,9 @@ const store = createStore(rootReducer, composeWithDevTools());
 class Root extends React.Component {
 
     componentDidMount(){
-        console.log(this.props.currentUser);
-        firebase.auth().onAuthStateChanged(user => {
+
+
+     /*   firebase.auth().onAuthStateChanged(user => {
 
             if(user){
                 //we have user obj lets pass it to a global function (action function) which is in props
@@ -47,7 +51,31 @@ class Root extends React.Component {
                 this.props.history.push('/login')
                 this.props.clearUser(user);
             }
-        });
+
+        });*/
+
+        let userId = window.localStorage.getItem('userId');
+        let companyName = window.localStorage.getItem('userCompanyName');
+        let user = {}
+        if(userId){
+            console.log(companyName);
+            console.log(userId);
+             user = {
+                uid: userId,
+                displayName: companyName
+            }
+            this.props.setUser(user);
+            if(this.props.history.location.pathname === '/login' ||
+                this.props.history.location.pathname === '/register' ) {
+
+                this.props.history.push('/')
+            }
+        }else{
+            console.log('no');
+            this.props.history.push('/login')
+            this.props.clearUser(user);
+        }
+
     }
     render() {
         return this.props.isLoading ? <Spinner /> : (
@@ -61,8 +89,11 @@ class Root extends React.Component {
                 <Route path="/register" component={Register} />
                 <Route path="/groups" component={Groups} />
                 <Route path="/holiday" component={Holiday} />
-                <Route path="/manager" component={Manager} />
+                <Route path="/users" component={User} />
                 <Route path="/calendar" component={Calendar} />
+                <Route path="/kudos" component={Kudos} />
+                <Route path="/kudos-board" component={Board} />
+                <Route component={Nomatch} />
             </Switch>
 
         )

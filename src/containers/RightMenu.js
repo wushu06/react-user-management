@@ -12,12 +12,13 @@ class RightMenu extends React.Component {
     render() {
         return (
                 <div>
-                    <IconButton color="inherit">
+                    <IconButton color="inherit"  className="profile_btn">
                         <Tooltip title="kudos" aria-label="Kudos">
                         <Badge badgeContent={4} color="secondary">
 
-
-                            <StarBorderRounded />
+                            <Link to="/kudos" >
+                              <StarBorderRounded />
+                            </Link>
                         </Badge>
                         </Tooltip>
                     </IconButton>

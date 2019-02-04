@@ -10,7 +10,6 @@ class UpdateUser extends React.Component {
         let loading = false;
         let result;
         const {firstName, lastName, email, password, group, holiday,isAdmin, phone, usersRef,profile , currentUser}= state;
-        console.log(profile.group);
 
         const updateUser = {
             firstName: firstName ? firstName : profile.firstName,
@@ -18,7 +17,7 @@ class UpdateUser extends React.Component {
             email: email ? email : profile.email ,
             phone: phone ? phone : '' ,
             // password:  password ?  password : profile.password ,
-            group:  group  ?  group : '' ,
+            group:  group  ?  group : profile.group,
             holiday:{
                remainingDays:  holiday ? holiday : profile.holiday.remainingDays,
 
@@ -40,20 +39,26 @@ class UpdateUser extends React.Component {
         /*
          * add user to the group
          */
+
         if(!group || !profile.group[0]) {
+            console.log('nop');
             return;
         }
+        console.log(profile.group[0]);
+        console.log(group[0]);
+        console.log(userId);
+
+
         const newUser = {[userId]:{
                 firstName: firstName ? firstName : profile.firstName,
                 id: userId
             }}
-        firebase.database().ref(collection).
-            child('groups')
+        firebase.database().ref(collection)
+            .child('groups')
             .child(profile.group[0])
             .child('users')
             .child(userId)
             .remove(err => {
-                this.setState({loading: false})
                 if (err !== null) {
                     console.error(err);
                 }else{
@@ -62,7 +67,6 @@ class UpdateUser extends React.Component {
                         .child('users')
                         .update(newUser)
                         .then(()=> {
-
                         })
                         .catch(err=> {
                             console.log(err);

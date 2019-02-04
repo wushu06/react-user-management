@@ -35,7 +35,9 @@ class Holiday extends React.Component {
         let collection = this.state.companyName.replace(/[^a-zA-Z0-9]/g, '');
 
         firebase.database().ref(collection).child('users').on('child_added', snap => {
-            if(snap.val().id === this.props.currentUser.uid) {
+
+            if(snap.val().id === Number(this.props.currentUser.uid)) {
+                console.log('yes');
                 snap.val().holiday && this.setState({
                     holiday: snap.val().holiday.remainingDays,
                     range: snap.val().holiday.range ? snap.val().holiday.range : []

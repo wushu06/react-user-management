@@ -31,8 +31,7 @@ class ManagerEdit extends React.Component {
     };
 
     componentDidMount() {
-        let loadUsers = [],
-            allGroups = [],
+        let allGroups = [],
             collection = this.props.collection.replace(/[^a-zA-Z0-9]/g, '');
         firebase.database().ref(collection).child('users').child(this.props.userId).on("value", snap => {
             this.setState({profile: snap.val(), isAdmin: snap.val().isAdmin})
@@ -55,18 +54,19 @@ class ManagerEdit extends React.Component {
         this.setState({
             [name]: event.target.value,
             groupId: event.target
-        }, ()=> console.log(this.state.groupId));
+        });
     };
     handleChangeCheckbox = event => {
         this.setState(prevState => ({
             isAdmin: !prevState.isAdmin
-        }), ()=> console.log(this.state.isAdmin));
+        }));
     }
 
     handleSubmit = e => {
         e.preventDefault();
         let update = new UpdateUser();
         update.handleSubmit(this.state, this.props.collection.replace(/[^a-zA-Z0-9]/g, ''), this.props.userId)
+
     }
 
     displayGroups = groups => (

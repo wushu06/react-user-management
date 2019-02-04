@@ -6,6 +6,8 @@ import {Link} from 'react-router-dom'
 import {connect} from 'react-redux'
 import $ from 'jquery'
 import ManagerEdit from './ManagerEdit';
+import AddUser from './AddUser';
+
 
 
 
@@ -19,7 +21,7 @@ class Manager extends React.Component {
         id: ''
 
 
-}
+    }
 
 
     componentDidMount(){
@@ -28,7 +30,7 @@ class Manager extends React.Component {
             let loadUsers = [];
             let collection = this.props.currentUser.displayName.replace(/[^a-zA-Z0-9]/g, '')
 
-            firebase.database().ref(collection).child('users').on('child_added', snap => {
+           /* firebase.database().ref(collection).child('users').on('child_added', snap => {
                 // whenever child added (message or anything else) execute these
 
                 loadUsers.push(snap.val());
@@ -46,7 +48,17 @@ class Manager extends React.Component {
                 this.setState({users: loadUsers})
 
 
-            })
+            })*/
+
+            firebase.database().ref(collection).child('users').on("value", snap => {
+                loadUsers = []
+                firebase.database().ref(collection).child('users').on('child_added', snap => {
+                    // whenever child added (message or anything else) execute these
+                    loadUsers.push(snap.val());
+                    this.setState({users: loadUsers})
+
+                });
+            });
         }
     }
 
@@ -146,12 +158,12 @@ class Manager extends React.Component {
             <div>
                 <Header/>
                 <div className="block_container">
-
-
                     <Grid container spacing={24}>
-
                         <Grid item xs={6}>
                             { users && this.displayUsers(users)}
+                        </Grid>
+                        <Grid item xs={6}>
+                            <AddUser groups={this.props.allGroups}/>
                         </Grid>
                     </Grid>
                 </div>
@@ -186,7 +198,8 @@ class Manager extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    currentUser: state.user.currentUser
+    currentUser: state.user.currentUser,
+    allGroups: state.groups.allGroups
 });
 
 
