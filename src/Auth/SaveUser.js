@@ -33,8 +33,10 @@ class SaveUser extends React.Component {
                    window.localStorage.setItem('userId', res.id);
                    window.localStorage.setItem('userCompanyName', res.name);
                }else{
+
                    this.saveUser(res, state)
                }
+
 
            })
            .then(err=>{
@@ -50,7 +52,7 @@ class SaveUser extends React.Component {
     saveUser = (createdUser,  state) => {
         let collection = state.companyName.replace(/[^a-zA-Z0-9]/g, '');
         let avatar =  `http://gravatar.com/avatar/${md5(
-            createdUser.email
+            state.email
         )}?d=identicon`
         // for the rest of users + admin
 
@@ -66,6 +68,7 @@ class SaveUser extends React.Component {
                 avatar: avatar,
                 id: createdUser.id,
                 isAdmin: state.isAdmin,
+                group: ' ',
                 holiday: {
                     remainingDays: 0,
                     range: []
@@ -76,7 +79,7 @@ class SaveUser extends React.Component {
         let collection = state.companyName.replace(/[^a-zA-Z0-9]/g, '');
         // const key = firebase.database().ref(collection).push().key
         let avatar =  `http://gravatar.com/avatar/${md5(
-            createdUser.email
+            state.email
         )}?d=identicon`
         const key = createdUser.id
         const newUser = {
