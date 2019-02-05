@@ -4,7 +4,7 @@ import {SwipeableDrawer, Divider, List, ListItem, ListItemIcon, ListItemText} fr
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import firebase from "../firebase";
 import {connect} from "react-redux";
-
+import {  withRouter} from 'react-router-dom';
 
 class LeftMenu extends React.Component {
     state = {
@@ -25,7 +25,7 @@ class LeftMenu extends React.Component {
     }
     handleLogout = () => {
         window.localStorage.removeItem('userId');
-         window.localStorage.removeItem('userCompanyName');
+        window.localStorage.removeItem('userCompanyName');
         this.props.history.push('/login')
        /* firebase
             .auth()
@@ -136,4 +136,4 @@ const mapStateToProps = state => ({
 });
 
 
-export default connect(mapStateToProps)(LeftMenu);
+export default withRouter(connect(mapStateToProps)(LeftMenu));
