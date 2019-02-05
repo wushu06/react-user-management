@@ -17,12 +17,12 @@ class UpdateUser extends React.Component {
             email: email ? email : profile.email ,
             phone: phone ? phone : '' ,
             // password:  password ?  password : profile.password ,
-            group:  group  ?  group : profile.group,
+            group:  group  ?  group : profile.group ? profile.group : '',
             holiday:{
                remainingDays:  holiday ? holiday : profile.holiday.remainingDays,
 
             },
-            isAdmin:  isAdmin
+            isAdmin:  isAdmin ? isAdmin : profile.isAdmin
         }
 
 
