@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom';
 import { SnackbarContent, Grid, Button,  FormControl, FormControlLabel, Checkbox, Input, InputLabel} from '@material-ui/core';
 import logo from '../logo.svg';
 import firebase from "../firebase";
-
+import {  withRouter} from 'react-router-dom';
 
 class Login extends React.Component {
 
@@ -42,10 +42,12 @@ class Login extends React.Component {
                 body: JSON.stringify({username:this.state.email, password: this.state.password})
             }).then(res=>res.json())
             .then(res => {
-                window.localStorage.setItem('conn', res.token);
+                window.localStorage.setItem('userId', res.user_id);
+                window.localStorage.setItem('userCompanyName',res.user_nicename  );
                 this.setState({
                     loading: false
                 })
+                this.props.history.push('/')
 
             });
         }
@@ -144,4 +146,4 @@ class Login extends React.Component {
     }
 }
 
-export default Login;
+export default withRouter(Login);
